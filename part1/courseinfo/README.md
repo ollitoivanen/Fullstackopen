@@ -1,1 +1,1 @@
-## Exercises 1.1 and 1.2.
+## Exercises 1.1 - 1.6
