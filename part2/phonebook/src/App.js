@@ -1,39 +1,67 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ContactList from "./components/ContactList";
 import Filter from "./components/Filter";
 import NewContactForm from "./components/NewContactForm";
 import Title from "./components/Title";
+import personService from "./services/persons";
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", pnumber: "040-123456" },
-    { name: "Ada Lovelace", pnumber: "39-44-5323523" },
-    { name: "Dan Abramov", pnumber: "12-43-234345" },
-    { name: "Mary Poppendieck", pnumber: "39-23-6423122" },
-  ]);
+  const [persons, setPersons] = useState([]);
+
+  useEffect(() => {
+    personService.getAll().then((initialPersons) => {
+      setPersons(initialPersons);
+    });
+  }, []);
+
   const [newName, setNewName] = useState("");
   const [newPnumber, setNewPnumber] = useState("");
   const [filter, setFilter] = useState("");
 
+  const handleDelete = (person) => {
+    const { name, id } = person;
+    if (!window.confirm(`Do you really want to delete ${name}?`)) return;
+    personService.deletePerson(id).then(() => {
+      setPersons(persons.filter((p) => p.id !== id));
+    });
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    if (checkIfExists()) {
-      alert(`${newName} is already added to the phonebook.`);
-      return;
-    }
 
     if (checkIfNotEmpty()) {
       alert("Add name and phone number");
       return;
     }
+
+    const existingPerson = checkIfExists();
+    if (existingPerson) {
+      if (!confirmUpdate()) return;
+      const personObject = { ...existingPerson, number: newPnumber };
+      personService.updatePerson(personObject).then((updatedPerson) => {
+        console.log(updatedPerson);
+        setPersons(
+          persons.map((p) => (p.id !== updatedPerson.id ? p : updatedPerson))
+        );
+      });
+      return;
+    }
     const personObject = {
       name: newName,
-      pnumber: newPnumber,
+      number: newPnumber,
     };
-    setPersons(persons.concat(personObject));
+
+    personService.addPerson(personObject).then((newPerson) => {
+      setPersons(persons.concat(newPerson));
+    });
     setNewName("");
     setNewPnumber("");
+  };
+
+  const confirmUpdate = () => {
+    return window.confirm(
+      `${newName} is already added to the phonebook. Do you want to replace the old number with a new one?`
+    );
   };
 
   const checkIfExists = () => {
@@ -71,7 +99,7 @@ const App = () => {
         newName={newName}
         newPnumber={newPnumber}
       />
-      <ContactList personsToShow={personsToShow} />
+      <ContactList personsToShow={personsToShow} handleDelete={handleDelete} />
     </div>
   );
 };

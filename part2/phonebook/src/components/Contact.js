@@ -1,14 +1,17 @@
 import React from "react";
 
-const Contact = ({ person }) => {
-  const { name, pnumber } = person;
+const Contact = ({ person, handleDelete }) => {
+  const { name, number } = person;
   return (
-    <div>
+    <>
       <tr>
         <td>{name}</td>
-        <td>{pnumber}</td>
+        <td>{number}</td>
+        <td>
+          <button onClick={handleDelete}>Delete</button>
+        </td>
       </tr>
-    </div>
+    </>
   );
 };
 
