@@ -2,11 +2,20 @@ import { useState, useEffect } from "react";
 import ContactList from "./components/ContactList";
 import Filter from "./components/Filter";
 import NewContactForm from "./components/NewContactForm";
+import Notification from "./components/Notification";
 import Title from "./components/Title";
 import personService from "./services/persons";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
+  const [notification, setNotification] = useState({
+    message: null,
+    error: null,
+  });
+
+  const [newName, setNewName] = useState("");
+  const [newPnumber, setNewPnumber] = useState("");
+  const [filter, setFilter] = useState("");
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
@@ -14,15 +23,15 @@ const App = () => {
     });
   }, []);
 
-  const [newName, setNewName] = useState("");
-  const [newPnumber, setNewPnumber] = useState("");
-  const [filter, setFilter] = useState("");
-
   const handleDelete = (person) => {
     const { name, id } = person;
     if (!window.confirm(`Do you really want to delete ${name}?`)) return;
     personService.deletePerson(id).then(() => {
       setPersons(persons.filter((p) => p.id !== id));
+      showNotification(
+        `Contact ${person.name} was deleted succesfully.`,
+        false
+      );
     });
   };
 
@@ -38,12 +47,24 @@ const App = () => {
     if (existingPerson) {
       if (!confirmUpdate()) return;
       const personObject = { ...existingPerson, number: newPnumber };
-      personService.updatePerson(personObject).then((updatedPerson) => {
-        console.log(updatedPerson);
-        setPersons(
-          persons.map((p) => (p.id !== updatedPerson.id ? p : updatedPerson))
-        );
-      });
+      personService
+        .updatePerson(personObject)
+        .then((updatedPerson) => {
+          setPersons(
+            persons.map((p) => (p.id !== updatedPerson.id ? p : updatedPerson))
+          );
+          showNotification(
+            `Contact ${existingPerson.name} was updated succesfully.`,
+            false
+          );
+        })
+        .catch((e) => {
+          showNotification(
+            `Contact ${existingPerson.name} has already been removed from the server.`,
+            true
+          );
+          setPersons(persons.filter((p) => p.id !== existingPerson.id));
+        });
       return;
     }
     const personObject = {
@@ -53,19 +74,23 @@ const App = () => {
 
     personService.addPerson(personObject).then((newPerson) => {
       setPersons(persons.concat(newPerson));
+      showNotification(
+        `Contact ${newPerson.name} was added succesfully.`,
+        false
+      );
+      setNewName("");
+      setNewPnumber("");
     });
-    setNewName("");
-    setNewPnumber("");
+  };
+
+  const checkIfExists = () => {
+    return persons.find((person) => person.name === newName);
   };
 
   const confirmUpdate = () => {
     return window.confirm(
       `${newName} is already added to the phonebook. Do you want to replace the old number with a new one?`
     );
-  };
-
-  const checkIfExists = () => {
-    return persons.find((person) => person.name === newName);
   };
 
   const checkIfNotEmpty = () => {
@@ -83,6 +108,16 @@ const App = () => {
     setFilter(event.target.value);
   };
 
+  const showNotification = (message, error) => {
+    setNotification({
+      message,
+      error,
+    });
+    setTimeout(() => {
+      setNotification({ message: null, error: null });
+    }, 3000);
+  };
+
   const personsToShow =
     filter.length === 0
       ? persons
@@ -92,6 +127,7 @@ const App = () => {
     <div>
       <Title />
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
+      <Notification message={notification.message} error={notification.error} />
       <NewContactForm
         handleSubmit={handleSubmit}
         handleNameChange={handleNameChange}
