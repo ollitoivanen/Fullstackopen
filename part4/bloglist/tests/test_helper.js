@@ -9,6 +9,7 @@ const intitialBlogs = [
     url: 'https://reactpatterns.com/',
     likes: 7,
     __v: 0,
+    user: '7a422a821b54a676236d17f2',
   },
   {
     _id: '5a422bc61b54a676234d17fc',
@@ -17,8 +18,20 @@ const intitialBlogs = [
     url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
     likes: 2,
     __v: 0,
+    user: '7a422a821b54a676236d17f2',
   },
 ];
+
+const initialUsers = {
+  _id: '7a422a821b54a676236d17f2',
+  username: 'root',
+  name: 'Mikko',
+  passwordHash: '$2b$10$rkSI4cRJnVX0vl93ZaI7xeKY27l.yMFgZLpDU7wAzJHqTm44JiNFe',
+  notes: [
+    '5a422a851b54a676234d17f7',
+    '5a422bc61b54a676234d17fc',
+  ],
+};
 
 const nonExistingId = async () => {
   const blog = new Blog({ content: 'willremovethissoon' });
@@ -39,5 +52,5 @@ const usersInDb = async () => {
 };
 
 module.exports = {
-  intitialBlogs, nonExistingId, blogsInDb, usersInDb,
+  intitialBlogs, initialUsers, nonExistingId, blogsInDb, usersInDb,
 };

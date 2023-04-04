@@ -10,8 +10,11 @@ const api = supertest(app);
 
 beforeEach(async () => {
   if (process.env.NODE_ENV === 'test') {
+    await User.deleteMany({});
+    await User.create(helper.initialUsers);
     await Blog.deleteMany({});
-    await Blog.insertMany(helper.intitialBlogs);
+    const result = await Blog.insertMany(helper.intitialBlogs);
+    console.log('Straight', result[0]._id);
   }
 });
 
@@ -155,15 +158,6 @@ test('Blog likes can be updated', async () => {
 });
 
 describe('when there is initially one user at db', () => {
-  beforeEach(async () => {
-    await User.deleteMany({});
-
-    const passwordHash = await bcrypt.hash('sekret', 10);
-    const user = new User({ username: 'root', passwordHash });
-
-    await user.save();
-  });
-
   test('creation succeeds with a fresh username', async () => {
     const usersAtStart = await helper.usersInDb();
 
@@ -259,6 +253,33 @@ test('creation fails properly if password is shorter than 3', async () => {
     .expect(400)
     .expect('Content-Type', /text\/html/);
   expect(result.error.text).toContain('Please give a password over 2 characters long');
+});
+
+describe('When a blog is added to db', () => {
+  test('user id is saved to the blog', async () => {
+    const usersAtStart = await helper.usersInDb();
+    console.log('usersAtStart', usersAtStart);
+    const userToSave = usersAtStart[0];
+    const blogsAtStart = await helper.blogsInDb();
+    const blogToSave = {
+      title: 'Testiblogi',
+      author: 'Mikko Maa',
+      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+      likes: 10,
+    };
+
+    await api
+      .post('/api/blogs')
+      .send({ ...blogToSave, userId: userToSave.id })
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
+
+    const blogsAtEnd = await helper.blogsInDb();
+    expect(blogsAtEnd).toHaveLength(blogsAtStart.length + 1);
+    const savedBlog = blogsAtEnd.find((blog) => blog.title === blogToSave.title);
+    console.log('saved blog', savedBlog, userToSave.id);
+    expect(savedBlog.user).toEqual(userToSave.id);
+  });
 });
 
 afterAll(async () => {
