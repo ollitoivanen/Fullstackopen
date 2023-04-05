@@ -16,6 +16,7 @@ const errorHandler = (err, req, res, next) => {
 const userExtractor = (req, res, next) => {
   const authorization = req.get('authorization');
   if (!authorization || !authorization.startsWith('Bearer ')) {
+    res.status(401).json({ error: 'Token invalid' });
     next();
   }
 

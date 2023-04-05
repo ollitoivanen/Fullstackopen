@@ -73,8 +73,8 @@ const blogsFavorite = {
 };
 
 test('dummy returns one', () => {
-  const blogs = [];
-  const result = listHelper.dummy(blogs);
+  const dummyBlogs = [];
+  const result = listHelper.dummy(dummyBlogs);
   expect(result).toBe(1);
 });
 
