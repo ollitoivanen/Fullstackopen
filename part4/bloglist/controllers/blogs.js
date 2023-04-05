@@ -11,19 +11,8 @@ blogsRouter.get('/', async (request, response) => {
   response.json(blogs);
 });
 
-const getTokenFrom = (request) => {
-  console.log('täällä');
-  const authorization = request.get('authorization');
-  if (authorization && authorization.startsWith('Bearer ')) {
-    return authorization.replace('Bearer ', '');
-  }
-  return null;
-};
-
 blogsRouter.post('/', async (request, response) => {
-  console.log('hi');
-  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET);
-  console.log('decodedToken', decodedToken);
+  const decodedToken = jwt.verify(request.token, process.env.SECRET);
   if (!decodedToken.id) {
     response.status(401).json({ error: 'token invalid' });
     return;
