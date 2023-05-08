@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import Notification from './components/Notification'
+
 import loginService from './services/login'
 import blogService from './services/blogs'
 
@@ -9,7 +11,7 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [message, setMessage] = useState(null)
   const [author, setAuthor] = useState('')
   const [title, setTitle] = useState('')
   const [url, setUrl] = useState('')
@@ -48,9 +50,9 @@ const App = () => {
         'loggedBloglistUser', JSON.stringify(user)
       ) 
     } catch (exception) {
-      setErrorMessage('wrong credentials')
+      setMessage('wrong credentials')
       setTimeout(() => {
-        setErrorMessage(null)
+        setMessage(null)
       }, 5000)
     }  
   }
@@ -60,7 +62,7 @@ const App = () => {
       setUser(null)
   }
 
-  const addBlog = (event) => {
+  const addBlog = async (event) => {
     event.preventDefault()
     const blogObject = {
       title,
@@ -68,16 +70,24 @@ const App = () => {
       url,
       likes:0
     }
-    blogService
-      .create(blogObject)
-        .then(returnedBlog => {
-        setBlogs(blogs.concat(returnedBlog))
-        setAuthor('')
-        setTitle('')
-        setUrl('')
-
-      })
-  }
+    try {
+      const returnedBlog = await blogService.create(blogObject)
+      setBlogs(blogs.concat(returnedBlog))
+      setAuthor('')
+      setTitle('')
+      setUrl('')
+      setMessage('Post saved successfully')
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+    } catch (error) {
+      setMessage('Error with saving post')
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+    }  
+    }
+   
 
   const handleAuthorChange = (event) => {
     setAuthor(event.target.value)
@@ -91,8 +101,6 @@ const App = () => {
     setUrl(event.target.value)
   }
   
-
-
     const loginForm = () => (
       <>
       <h2>Log in to application</h2>
@@ -152,10 +160,12 @@ const App = () => {
         <Blog key={blog.id} blog={blog} />
       )}
       </>
-
     )
+  
 return(
   <div>
+    <Notification message={message} />
+
     {!user && loginForm()}
     {user && blogsView()}
   </div>
@@ -163,7 +173,7 @@ return(
 )
    
   
-    
-}
+} 
+
 
 export default App
