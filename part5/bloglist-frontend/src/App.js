@@ -9,6 +9,12 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [author, setAuthor] = useState('')
+  const [title, setTitle] = useState('')
+  const [url, setUrl] = useState('')
+
+
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -21,7 +27,7 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
-      //noteService.setToken(user.token)
+      blogService.setToken(user.token)
     }
   }, [])
 
@@ -34,15 +40,17 @@ const App = () => {
         username, password,
       })
       setUser(user)
+      blogService.setToken(user.token)
+
       setUsername('')
       setPassword('')
       window.localStorage.setItem(
         'loggedBloglistUser', JSON.stringify(user)
       ) 
     } catch (exception) {
-      //setErrorMessage('wrong credentials')
+      setErrorMessage('wrong credentials')
       setTimeout(() => {
-        //setErrorMessage(null)
+        setErrorMessage(null)
       }, 5000)
     }  
   }
@@ -51,6 +59,38 @@ const App = () => {
       window.localStorage.removeItem('loggedBloglistUser');
       setUser(null)
   }
+
+  const addBlog = (event) => {
+    event.preventDefault()
+    const blogObject = {
+      title,
+      author,
+      url,
+      likes:0
+    }
+    blogService
+      .create(blogObject)
+        .then(returnedBlog => {
+        setBlogs(blogs.concat(returnedBlog))
+        setAuthor('')
+        setTitle('')
+        setUrl('')
+
+      })
+  }
+
+  const handleAuthorChange = (event) => {
+    setAuthor(event.target.value)
+  }
+
+  const handleTitleChange = (event) => {
+    setTitle(event.target.value)
+  }
+
+  const handleUrlChange = (event) => {
+    setUrl(event.target.value)
+  }
+  
 
 
     const loginForm = () => (
@@ -80,20 +120,44 @@ const App = () => {
       </>    
     )
 
-    const blogsList = () => (
-    <>
-    <h2>blogs</h2>
-    <p>{`${user.name} logged in`}</p>
-    <button onClick={handleLogout}>logout</button>
-    {blogs.map(blog => 
-      <Blog key={blog.id} blog={blog} />
-    )}
-    </>
+    const blogsView = () => (
+      <>
+      <h2>blogs</h2>
+      <form onSubmit={addBlog}>
+      <div style={{content: 'flex', flexDirection: 'row'}}>
+      <p>Author</p>
+          <input
+            title="Author"
+            value={author}
+            onChange={handleAuthorChange}
+          />
+      <p>Title</p>
+          <input
+            title="Title"
+            value={title}
+            onChange={handleTitleChange}
+          />
+        <p>Url</p>
+          <input
+            title="Url"
+            value={url}
+            onChange={handleUrlChange}
+          />
+          <button type="submit">save</button>
+          </div>
+        </form>  
+      <p>{`${user.name} logged in`}</p>
+      <button onClick={handleLogout}>logout</button>
+      {blogs.map(blog => 
+        <Blog key={blog.id} blog={blog} />
+      )}
+      </>
+
     )
 return(
   <div>
-{  !user && loginForm()
-}    {user && blogsList()}
+    {!user && loginForm()}
+    {user && blogsView()}
   </div>
 
 )
