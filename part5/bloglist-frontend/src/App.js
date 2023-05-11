@@ -68,15 +68,12 @@ const App = () => {
   const addBlog = async (blogObject) => {
     
     try {
-      const returnedBlog = await blogService.create(blogObject)
-      setBlogs(blogs.concat(returnedBlog))
+      await blogService.create(blogObject)
+      const newBlogs = await blogService.getAll()
+      setBlogs(newBlogs)
       
       setMessage('Post saved successfully')
       blogFormRef.current.toggleVisibility()
-
-      setTimeout(() => {
-        setMessage(null)
-      }, 5000)
     } catch (error) {
       setMessage('Error with saving post')
       setTimeout(() => {
