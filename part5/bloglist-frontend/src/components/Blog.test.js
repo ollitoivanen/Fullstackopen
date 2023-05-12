@@ -57,3 +57,21 @@ test('clicking the view-button shows url, likes and user', async () => {
   expect(likes).toBeDefined()
   expect(userName).toBeDefined()
 })
+
+test('clicking the like button twice calls event handler twice', async () => {
+
+  const mockHandler = jest.fn()
+
+  render(
+    <Blog blog={blog} user={user} onLike={mockHandler}/>
+  )
+  const userForEvent = userEvent.setup()
+
+  const viewButton = screen.getByText('view')
+  await userForEvent.click(viewButton)
+
+  const likeButton = screen.getByText('like')
+  await userForEvent.dblClick(likeButton)
+
+  expect(mockHandler.mock.calls).toHaveLength(2)
+})
