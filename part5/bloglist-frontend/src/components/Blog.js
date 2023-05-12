@@ -5,12 +5,13 @@ const Blog = ({ blog, user, onLike, onDelete }) => {
   const [expanded, setExpanded] = useState(false)
 
   const toggleExpanded = () => {
+    console.log(user)
     setExpanded(!expanded)
   }
 
   const normalBlog = () => (
     <div style={{ margin: 8 }}>
-      {blog.title} {blog.author}
+      {`${blog.title}, ${blog.author}`}
       <button onClick={toggleExpanded}>view</button>
     </div>
   )
