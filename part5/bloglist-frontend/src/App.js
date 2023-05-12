@@ -26,7 +26,6 @@ const App = () => {
     const fetch = async () => {
       const blogs = await blogService.getAll()
       setBlogs( blogs )
-      console.log(blogs)
     }
     fetch()
   }, [])
@@ -97,7 +96,6 @@ const App = () => {
 
   const likeBlog = async(blog) => {
     const { user, likes, author, title, url } = blog
-    console.log(blog)
     const blogObject = {
       user: user.id,
       likes: likes + 1,
@@ -112,12 +110,15 @@ const App = () => {
   }
 
   const deleteBlog = async (blog) => {
-    console.log('blog', blog)
     if(!window.confirm(`Do you want to delete blog ${blog.title}?`)) return
     try {
       await blogService.deleteBlog(blog.id)
       const newBlogs = await blogService.getAll()
       setBlogs(newBlogs)
+      setMessage('Post deleted')
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
     } catch (error) {
       setMessage('Error with deleting post')
       setTimeout(() => {
@@ -131,7 +132,7 @@ const App = () => {
     <>
       <h2>blogs</h2>
       <p>{`${user.name} logged in`}</p>
-      <button onClick={handleLogout}>logout</button>
+      <button id="logout-button" onClick={handleLogout}>logout</button>
       <Togglable buttonLabel={'New blog'} ref={blogFormRef}>
         <BlogForm createBlog={addBlog}/>
       </Togglable>
@@ -143,7 +144,7 @@ const App = () => {
 
   return(
     <div>
-      <Notification message={message} />
+      <Notification className="blog" message={message} />
 
       {!user && <LoginForm
         username={username}

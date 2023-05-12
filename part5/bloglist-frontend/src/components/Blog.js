@@ -5,14 +5,13 @@ const Blog = ({ blog, user, onLike, onDelete }) => {
   const [expanded, setExpanded] = useState(false)
 
   const toggleExpanded = () => {
-    console.log(user)
     setExpanded(!expanded)
   }
 
   const normalBlog = () => (
     <div style={{ margin: 8 }}>
       {`${blog.title}, ${blog.author}`}
-      <button onClick={toggleExpanded}>view</button>
+      <button id="view-button" onClick={toggleExpanded}>view</button>
     </div>
   )
 
@@ -21,30 +20,30 @@ const Blog = ({ blog, user, onLike, onDelete }) => {
     }}>
       <div>
         {`${blog.title}, ${blog.author}`}
-        <button onClick={toggleExpanded}>close</button>
+        <button id="close-button" onClick={toggleExpanded}>close</button>
       </div>
       <p>
         {blog.url}
       </p>
       <div>
         Likes: {blog.likes}
-        <button onClick={() => onLike(blog)}>like</button>
+        <button id="like-button" onClick={() => onLike(blog)}>like</button>
       </div>
       <p>
       </p>
       <p>
         {blog.user.name}
       </p>
-      {blog.user.id === user.id ? <button onClick={() => onDelete(blog)}>Delete</button>: null}
+      {blog.user.id === user.id ? <button id="delete-button" onClick={() => onDelete(blog)}>Delete</button>: null}
 
     </div>
   )
 
   return(
-    <>
+    <div className="blog">
       {expanded && expandedBlog()}
       {!expanded  && normalBlog()}
-    </>
+    </div>
 
   )
 }
