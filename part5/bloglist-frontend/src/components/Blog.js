@@ -20,7 +20,7 @@ const Blog = ({ blog, user, onLike, onDelete }) => {
     <div style={{ padding: 8, borderWidth: 2, borderColor: 'black', borderRadius:10, border: 'solid',
     }}>
       <div>
-        {blog.title} {blog.author}
+        {`${blog.title}, ${blog.author}`}
         <button onClick={toggleExpanded}>close</button>
       </div>
       <p>
