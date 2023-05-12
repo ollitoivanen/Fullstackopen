@@ -42,18 +42,21 @@ const BlogForm =({ createBlog }) => {
         <div style={{ content: 'flex', flexDirection: 'row' }}>
           <p>Author</p>
           <input
+            id="author"
             title="Author"
             value={author}
             onChange={handleAuthorChange}
           />
           <p>Title</p>
           <input
+            id="title"
             title="Title"
             value={title}
             onChange={handleTitleChange}
           />
           <p>Url</p>
           <input
+            id="url"
             title="Url"
             value={url}
             onChange={handleUrlChange}
