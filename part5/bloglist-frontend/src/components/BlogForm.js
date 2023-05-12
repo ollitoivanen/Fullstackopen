@@ -1,66 +1,72 @@
-import React, { useState } from 'react';
+import PropTypes from 'prop-types'
 
-const BlogForm =({createBlog})=>{
+import React, { useState } from 'react'
 
-    const [author, setAuthor] = useState('')
-    const [title, setTitle] = useState('')
-    const [url, setUrl] = useState('')
+const BlogForm =({ createBlog }) => {
 
-    const handleAuthorChange = (event) => {
-        setAuthor(event.target.value)
-      }
-    
-    const handleTitleChange = (event) => {
+  const [author, setAuthor] = useState('')
+  const [title, setTitle] = useState('')
+  const [url, setUrl] = useState('')
+
+  const handleAuthorChange = (event) => {
+    setAuthor(event.target.value)
+  }
+
+  const handleTitleChange = (event) => {
     setTitle(event.target.value)
-    }
+  }
 
-    const handleUrlChange = (event) => {
+  const handleUrlChange = (event) => {
     setUrl(event.target.value)
-    }
+  }
 
-    const addBlog = (event) => {
-        event.preventDefault()
-        const blogObject = {
-            title,
-            author,
-            url,
-            likes:0
-        }
-        createBlog(blogObject)
-        setAuthor('')
-        setTitle('')
-        setUrl('')
+  const addBlog = (event) => {
+    event.preventDefault()
+    const blogObject = {
+      title,
+      author,
+      url,
+      likes:0
     }
-return (
+    createBlog(blogObject)
+    setAuthor('')
+    setTitle('')
+    setUrl('')
+  }
+  return (
     <>
-<h2>Create new</h2>
+      <h2>Create new</h2>
 
-<form onSubmit={addBlog}>
+      <form onSubmit={addBlog}>
 
-<div style={{content: 'flex', flexDirection: 'row'}}>
-<p>Author</p>
-    <input
-      title="Author"
-      value={author}
-      onChange={handleAuthorChange}
-    />
-<p>Title</p>
-    <input
-      title="Title"
-      value={title}
-      onChange={handleTitleChange}
-    />
-  <p>Url</p>
-    <input
-      title="Url"
-      value={url}
-      onChange={handleUrlChange}
-    />
-    <button type="submit">save</button>
-    </div>
-  </form>  
-  </>
-);
+        <div style={{ content: 'flex', flexDirection: 'row' }}>
+          <p>Author</p>
+          <input
+            title="Author"
+            value={author}
+            onChange={handleAuthorChange}
+          />
+          <p>Title</p>
+          <input
+            title="Title"
+            value={title}
+            onChange={handleTitleChange}
+          />
+          <p>Url</p>
+          <input
+            title="Url"
+            value={url}
+            onChange={handleUrlChange}
+          />
+          <button type="submit">save</button>
+        </div>
+      </form>
+    </>
+  )
+}
+
+BlogForm.propTypes = {
+  createBlog: PropTypes.func.isRequired
 }
 
 export default BlogForm

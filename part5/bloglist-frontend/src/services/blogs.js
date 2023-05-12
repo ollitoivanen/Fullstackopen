@@ -15,10 +15,31 @@ const create = async newObject => {
   return response.data
 }
 
-const getAll = () => {
-  const request = axios.get(baseUrl)
-  return request.then(response => response.data)
+const put = async (newObject, objectId) => {
+  const config = {
+    headers: { Authorization: token },
+  }
+  const fullUrl = `${baseUrl}/${objectId}`
+  const response = await axios.put(fullUrl, newObject, config)
+  return response.data
 }
 
-// eslint-disable-next-line import/no-anonymous-default-export
-export default { getAll, create, setToken }
+const deleteBlog = async (objectId) => {
+  const config = {
+    headers: { Authorization: token },
+  }
+  const fullUrl = `${baseUrl}/${objectId}`
+  const response = await axios.delete(fullUrl, config)
+  return response.data
+}
+
+const getAll = async () => {
+  const response = await axios.get(baseUrl)
+  response.data.sort(function(a, b) {
+    return b.likes - a.likes
+
+  })
+
+  return response.data
+}
+export default { getAll, create, setToken, put, deleteBlog }
