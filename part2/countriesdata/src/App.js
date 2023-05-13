@@ -44,7 +44,6 @@ const App = () => {
 
   const renderCountries = () => {
     const countriesLength = resultCountries.length;
-    console.log(resultCountries);
     if (countriesLength === 0) return <p>No results</p>;
     if (countriesLength === 1) {
       const country = resultCountries[0];
